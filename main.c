@@ -6,26 +6,32 @@
 #include "sprites.h"
 #include "map.h"
 
+#define VISIBLE_MAP_SIZE 8
+
+char hero_buffer[512];
+
 void pause(unsigned int t);
-void draw_wall_sprite(unsigned char x, unsigned char y, char *p_sprite);
+void draw_wall_sprite(unsigned char x, unsigned char y);
 void fade_in();
 void fade_out();
 
 void main() {
   fade_in();
-  for (unsigned char y = 0; y < 8; y++) {
-    for (unsigned char x = 0; x < 8; x++) {
-      unsigned char wall = map[y][x];
-      draw_wall_sprite(8 - x, y, (char *)wall_sprite_set[wall]);	
+  for (signed char y = 0; y < VISIBLE_MAP_SIZE; y++) {
+    for (signed char x = VISIBLE_MAP_SIZE - 1; x >= 0; x--) {
+      draw_wall_sprite(x, y);	
     }
   }
   fade_out();
-  while(1);
+  while(1) {
+  }
 }
 
-void draw_wall_sprite(unsigned char x, unsigned char y, char *p_sprite) {
+void draw_wall_sprite(unsigned char x, unsigned char y) {
+  unsigned char wall = map[y][x];
+  char *p_sprite = (char *)wall_sprite_set[wall];
   char *p_mask = p_sprite + SPRITE_HEIGHT * SPRITE_WIDTH;
-  unsigned char iso_x = (x + y - 1) * 2;
+  unsigned char iso_x = (y + x) * 2;
   unsigned char iso_y = (y - x + 8) * 8;  
   for (unsigned char i = 0; i < SPRITE_HEIGHT; i++) {
     char *p_screen = (char *)(screen_line_addrs[iso_y + i] + iso_x);
@@ -34,6 +40,7 @@ void draw_wall_sprite(unsigned char x, unsigned char y, char *p_sprite) {
     }
   }
 }
+
 
 void pause(unsigned int t) {
   for (;t > 0; t--) {
