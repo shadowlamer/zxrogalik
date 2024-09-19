@@ -8,9 +8,13 @@
 
 #define VISIBLE_MAP_SIZE 8
 
+#define ISO_X(x, y) ((y + x) * 2)
+#define ISO_Y(x, y) ((y - x + 8) * 8)
+
 char hero_buffer[512];
 
 void pause(unsigned int t);
+void draw_sprite(unsigned char x, unsigned char y, char *p_sprite);
 void draw_wall_sprite(unsigned char x, unsigned char y);
 void fade_in();
 void fade_out();
@@ -30,17 +34,18 @@ void main() {
 void draw_wall_sprite(unsigned char x, unsigned char y) {
   unsigned char wall = map[y][x];
   char *p_sprite = (char *)wall_sprite_set[wall];
+  draw_sprite(ISO_X(x, y), ISO_Y(x, y), p_sprite);
+}
+
+void draw_sprite(unsigned char x, unsigned char y, char *p_sprite) {
   char *p_mask = p_sprite + SPRITE_HEIGHT * SPRITE_WIDTH;
-  unsigned char iso_x = (y + x) * 2;
-  unsigned char iso_y = (y - x + 8) * 8;  
   for (unsigned char i = 0; i < SPRITE_HEIGHT; i++) {
-    char *p_screen = (char *)(screen_line_addrs[iso_y + i] + iso_x);
+    char *p_screen = (char *)(screen_line_addrs[y + i] + x);
     for (unsigned char j = 0; j < SPRITE_WIDTH; j++) {
     *p_screen = (*p_screen++ & *p_mask++) | *p_sprite++;
     }
-  }
+  }  
 }
-
 
 void pause(unsigned int t) {
   for (;t > 0; t--) {
